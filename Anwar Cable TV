@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anwar Cable TV - Broadcast Control Center</title>
+    <style>
+        :root {
+            --primary-1: #1a237e;
+            --primary-2: #283593;
+            --primary-3: #303f9f;
+            --secondary-1: #d32f2f;
+            --secondary-2: #f44336;
+            --secondary-3: #ff5252;
+            --accent-1: #ffab00;
+            --accent-2: #ffc400;
+            --accent-3: #ffd740;
+            --text-light: #f5f5f5;
+            --text-dark: #212121;
+            --bg-dark: #121212;
+            --bg-medium: #1e1e1e;
+            --bg-light: #2a2a2a;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --error: #f44336;
+            --info: #2196f3;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            overflow: hidden;
+        }
+        
+        .dual-monitor {
+            display: flex;
+            height: 100vh;
+        }
+        
+        /* Monitor 1 - Control Panel */
+        .monitor-1 {
+            width: 40%;
+            background-color: var(--bg-medium);
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            border-right: 3px solid var(--accent-1);
+        }
+        
+        /* Monitor 2 - Output Display */
+        .monitor-2 {
+            width: 60%;
+            background-color: black;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            position: relative;
+        }
+        
+        header {
+            background: linear-gradient(to right, var(--primary-1), var(--primary-3));
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--accent-1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            height: 50px;
+            margin-right: 15px;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            color: var(--accent-2);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+        
+        .live-badge {
+            background-color: var(--secondary-2);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+            box-shadow: 0 0 10px var(--secondary-2);
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        
+        .time-date {
+            text-align: right;
+        }
+        
+        .time-date div:first-child {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent-2);
+        }
+        
+        .time-date div:last-child {
+            font-size: 16px;
+        }
+        
+        .main-content {
+            padding: 20px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-rows: auto auto 1fr;
+            gap: 20px;
+        }
+        
+        .service-section {
+            margin-bottom: 20px;
+        }
+        
+        .service-section h2 {
+            color: var(--accent-2);
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--primary-3);
+            display: flex;
+            align-items: center;
+        }
+        
+        .service-section h2 i {
+            margin-right: 10px;
+        }
+        
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+        }
+        
+        .service-card {
+            background-color: var(--bg-light);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            border-left-color: var(--accent-2);
+        }
+        
+        .service-card h3 {
+            color: var(--accent-2);
+            margin-bottom: 10px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .service-card h3 i {
+            margin-right: 8px;
+            font-size: 14px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn i {
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-3);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #3d8b40;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: var(--text-dark);
+        }
+        
+        .btn-warning:hover {
+            background-color: #e68a00;
+        }
+        
+        .btn-danger {
+            background-color: var(--error);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #d32f2f;
+        }
+        
+        .btn-accent {
+            background-color: var(--accent-1);
+            color: var(--text-dark);
+        }
+        
+        .btn-accent:hover {
+            background-color: var(--accent-2);
+        }
+        
+        .btn-info {
+            background-color: var(--info);
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background-color: #0d8aee;
+        }
+        
+        .btn-sm {
+            padding: 5px 8px;
+            font-size: 12px;
+        }
+        
+        .btn-lg {
+            padding: 12px 20px;
+            font-size: 16px;
+        }
+        
+        select, input[type="text"], input[type="time"], input[type="number"], textarea {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid var(--primary-3);
+            background-color: var(--bg-medium);
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+        
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .status-on {
+            background-color: var(--success);
+            box-shadow: 0 0 8px var(--success);
+        }
+        
+        .status-off {
+            background-color: var(--error);
+        }
+        
+        .status-standby {
+            background-color: var(--warning);
+            box-shadow: 0 0 8px var(--warning);
+        }
+        
+        /* Monitor 2 Styles */
+        .video-output {
+            position: relative;
+            height: 100%;
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+        }
+        
+        .output-element {
+            position: absolute;
+            background-color: rgba(0,0,0,0.7);
+            border-radius: 6px;
+            padding: 10px 15px;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+        }
+        
+        .channel-logo {
+            top: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: white;
+            border: 2px solid var(--accent-2);
+            font-size: 28px;
+        }
+        
+        .l-advertisement {
+            bottom: 100px;
+            left: 20px;
+            width: 350px;
+            height: 120px;
+            background: linear-gradient(to right, rgba(210, 47, 47, 0.8), rgba(244, 67, 54, 0.8));
+            border-left: 5px solid var(--accent-1);
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .scrolling-text {
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(to right, var(--primary-1), var(--primary-3));
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            overflow: hidden;
+        }
+        
+        .scrolling-text-content {
+            white-space: nowrap;
+            animation: scroll 20s linear infinite;
+        }
+        
+        @keyframes scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        .next-program {
+            top: 20px;
+            left: 20px;
+            background-color: rgba(33, 150, 243, 0.9);
+            font-size: 16px;
+        }
+        
+        .prayer-times-bar {
+            top: 70px;
+            left: 20px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .prayer-time {
+            text-align: center;
+        }
+        
+        .prayer-time div:first-child {
+            font-weight: bold;
+            color: var(--accent-2);
+            font-size: 14px;
+        }
+        
+        .prayer-time div:last-child {
+            font-size: 16px;
+        }
+        
+        .sports-scores {
+            top: 120px;
+            left: 20px;
+            display: flex;
+            gap: 25px;
+        }
+        
+        .score-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .score-item img {
+            height: 24px;
+            margin-right: 8px;
+        }
+        
+        footer {
+            background: linear-gradient(to right, var(--primary-1), var(--primary-3));
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+        
+        .contact-info {
+            display: flex;
+            gap: 20px;
+        }
+        
+        /* Playback Controls */
+        .playback-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            background-color: var(--bg-medium);
+            height: 6px;
+            border-radius: 3px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, var(--accent-1), var(--accent-3));
+            width: 45%;
+        }
+        
+        /* Timeline */
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 5px;
+        }
+        
+        /* Volume Control */
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .volume-icon {
+            color: var(--accent-2);
+            font-size: 20px;
+        }
+        
+        /* Schedule Timeline */
+        .schedule-timeline {
+            background-color: var(--bg-light);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        
+        .schedule-item {
+            padding: 8px;
+            border-left: 3px solid var(--primary-2);
+            margin-bottom: 5px;
+        }
+        
+        .schedule-item.current {
+            background-color: rgba(255, 171, 0, 0.1);
+            border-left-color: var(--accent-1);
+            font-weight: bold;
+        }
+        
+        /* Tab Navigation */
+        .service-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-3);
+        }
+        
+        .service-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .service-tab.active {
+            border-bottom: 3px solid var(--accent-2);
+            color: var(--accent-2);
+            font-weight: bold;
+        }
+        
+        /* Content Editor */
+        .content-editor {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .editor-preview {
+            background-color: var(--bg-light);
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 200px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="dual-monitor">
+        <!-- Monitor 1 - Control Panel -->
+        <div class="monitor-1">
+            <header>
+                <div class="logo">
+                    <img src="logo.png" alt="Anwar Cable TV Logo">
+                    <h1>Anwar Cable TV Control Center</h1>
+                </div>
+                <div class="time-date">
+                    <div id="current-time">12:45:30 PM</div>
+                    <div id="current-date">Sunday, June 22, 2025</div>
+                </div>
+            </header>
+            
+            <div class="main-content">
+                <!-- Playback Section -->
+                <div class="service-section">
+                    <h2><i class="fas fa-play-circle"></i> Playback Control</h2>
+                    <div class="playback-controls">
+                        <button class="btn btn-danger btn-lg"><i class="fas fa-stop"></i> Stop</button>
+                        <button class="btn btn-warning btn-lg"><i class="fas fa-pause"></i> Pause</button>
+                        <button class="btn btn-success btn-lg"><i class="fas fa-play"></i> Play</button>
+                        <button class="btn btn-primary btn-lg"><i class="fas fa-step-forward"></i> Next</button>
+                        <button class="btn btn-accent btn-lg"><i class="fas fa-redo"></i> Repeat</button>
+                    </div>
+                    
+                    <div class="progress-container">
+                        <div class="progress-bar"></div>
+                    </div>
+                    <div class="timeline">
+                        <span>0:00</span>
+                        <span>2:30</span>
+                        <span>5:00</span>
+                        <span>7:30</span>
+                        <span>10:00</span>
+                    </div>
+                    
+                    <div class="volume-control">
+                        <i class="fas fa-volume-up volume-icon"></i>
+                        <input type="range" min="0" max="100" value="75">
+                        <span>75%</span>
+                    </div>
+                </div>
+                
+                <!-- Source & Broadcast Section -->
+                <div class="service-section">
+                    <h2><i class="fas fa-satellite-dish"></i> Source & Broadcast</h2>
+                    <div class="service-grid">
+                        <div class="service-card">
+                            <h3><i class="fas fa-video"></i> Video Source</h3>
+                            <select>
+                                <option>Camera 1</option>
+                                <option>Camera 2</option>
+                                <option>External Feed</option>
+                                <option>Playlist</option>
+                                <option>Live Stream</option>
+                            </select>
+                            <div class="button-group">
+                                <button class="btn btn-primary btn-sm"><i class="fas fa-sync"></i> Refresh</button>
+                                <button class="btn btn-info btn-sm"><i class="fas fa-cog"></i> Settings</button>
+                            </div>
+                        </div>
+                        
+                        <div class="service-card">
+                            <h3><i class="fas fa-microphone"></i> Audio Source</h3>
+                            <select>
+                                <option>Main Audio</option>
+                                <option>Backup Audio</option>
+                                <option>External Audio</option>
+                                <option>Mute</option>
+                            </select>
+                            <div class="button-group">
+                                <button class="btn btn-primary btn-sm"><i class="fas fa-headphones"></i> Test</button>
+                                <button class="btn btn-info btn-sm"><i class="fas fa-sliders-h"></i> Mixer</button>
+                            </div>
+                        </div>
+                        
+                        <div class="service-card">
+                            <h3><i class="fas fa-tv"></i> Output Settings</h3>
+                            <select>
+                                <option>1080p HD</option>
+                                <option>720p HD</option>
+                                <option>480p SD</option>
+                                <option>Auto</option>
+                            </select>
+                            <div class="button-group">
+                                <button class="btn btn-primary btn-sm"><i class="fas fa-cog"></i> Configure</button>
+                                <button class="btn btn-success btn-sm"><i class="fas fa-check"></i> Apply</button>
+                            </div>
+                        </div>
+                        
+                        <div class="service-card">
+                            <h3><i class="fas fa-broadcast-tower"></i> Broadcast Status</h3>
+                            <p><span class="status-indicator status-on"></span> Encoder: Running</p>
+                            <p><span class="status-indicator status-on"></span> Stream: Active</p>
+                            <div class="button-group">
+                                <button class="btn btn-danger btn-sm"><i class="fas fa-power-off"></i> Restart</button>
+                                <button class="btn btn-warning btn-sm"><i class="fas fa-sync-alt"></i> Reconnect</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Content Management Section -->
+                <div class="service-section">
+                    <div class="service-tabs">
+                        <div class="service-tab active" data-tab="schedule"><i class="fas fa-calendar-alt"></i> Schedule</div>
+                        <div class="service-tab" data-tab="ads"><i class="fas fa-ad"></i> Advertisement</div>
+                        <div class="service-tab" data-tab="content"><i class="fas fa-film"></i> Content</div>
+                        <div class="service-tab" data-tab="graphics"><i class="fas fa-shapes"></i> Graphics</div>
+                    </div>
+                    
+                    <!-- Schedule Tab -->
+                    <div id="schedule-tab" class="tab-content active">
+                        <div class="service-grid">
+                            <div class="service-card">
+                                <h3><i class="fas fa-clock"></i> Current Program</h3>
+                                <p><strong>News Bulletin</strong></p>
+                                <p>12:45 PM - 1:00 PM</p>
+                                <div class="button-group">
+                                    <button class="btn btn-info btn-sm"><i class="fas fa-info-circle"></i> Details</button>
+                                    <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</button>
+                                </div>
+                            </div>
+                            
+                            <div class="service-card">
+                                <h3><i class="fas fa-chevron-circle-right"></i> Next Program</h3>
+                                <p><strong>The Guardian (Movie)</strong></p>
+                                <p>2:00 PM - 4:30 PM</p>
+                                <div class="button-group">
+                                    <button class="btn btn-info btn-sm"><i class="fas fa-info-circle"></i> Details</button>
+                                    <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</button>
+                                </div>
+                            </div>
+                            
+                            <div class="service-card">
+                                <h3><i class="fas fa-calendar-day"></i> Daily Schedule</h3>
+                                <select>
+                                    <option>Today (Jun 22)</option>
+                                    <option>Tomorrow (Jun 23)</option>
+                                    <option>Weekly View</option>
+                                </select>
+                                <div class="button-group">
+                                    <button class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Add</button>
+                                    <button class="btn btn-success btn-sm"><i class="fas fa-save"></i> Save</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="schedule-timeline">
+                            <div class="schedule-item">
+                                <strong>12:00 PM - 12:45 PM:</strong> Cartoon Show
+                            </div>
+                            <div class="schedule-item current">
+                                <strong>12:45 PM - 1:00 PM:</strong> News Bulletin
+                            </div>
+                            <div class="schedule-item">
+                                <strong>1:00 PM - 2:00 PM:</strong> Talk Show
+                            </div>
+                            <div class="schedule-item">
+                                <strong>2:00 PM - 4:30 PM:</strong> The Guardian (Movie)
+                            </div>
+                            <div class="schedule-item">
+                                <strong>4:30 PM - 5:30 PM:</strong> Sports Highlights
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Advertisement Tab -->
+                    <div id="ads-tab" class="tab-content">
+                        <div class="service-grid">
+                            <div class="service-card">
+                                <h3><i class="fas fa-ad"></i> Current Ad</h3>
+                                <p><strong>Coca-Cola Summer</strong></p>
+                                <p>Duration: 30 seconds</p>
+                                <div class="button-group">
+                                    <button class="btn btn-danger btn-sm"><i class="fas fa-stop"></i> Stop</button>
+                                    <button class="btn btn-info btn-sm"><i class="fas fa-eye"></i> Preview</button>
+                                </div>
+                            </div>
+                            
+                            <div class="service-card">
+                                <h3><i class="fas fa-adjust"></i> Ad Types</h3>
+                                <select>
+                                    <option>Standard</option>
+                                    <option>L-Type</option>
+                                    <option>Scrolling</option>
+                                    <option>Bottom Banner</option>
+                                </select>
+                                <div class="button-group">
+                                    <button class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> New</button>
+                                    <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</button>
+                                </div>
+                            </div>
+                            
+                            <div class="service-card">
+                                <h3><i class="fas fa-clock"></i> Ad Schedule</h3>
+                                <p><strong>Next:</strong> Pepsi Ad</p>
+                                <p><strong>In:</strong> 15 minutes</p>
+                                <div class="button-group">
+                                    <button class="btn btn-primary btn-sm"><i class="fas fa-calendar-plus"></i> Schedule</button>
+                                    <button class="btn btn-info btn-sm"><i class="fas fa-list"></i> View All</button>
+                                </div>
+                            </div>
+                            
+                            <div class="service-card">
+                                <h3><i class="fas fa-bullhorn"></i> Ad Campaigns</h3>
+                                <p>3 active campaigns</p>
+                                <p>12 total ads</p>
+                                <div class="button-group">
+                                    <button class="btn btn-success btn-sm"><i class="fas fa-plus"></i> New Campaign</button>
+                                    <button class="btn btn-info btn-sm"><i class="fas fa-chart-bar"></i> Reports</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Content Tab -->
+                    <div id="content-tab" class="tab-content">
+                        <div class="service-grid">
+                            <div class="service-card">
+                                <h3><i class="fas fa-folder-open"></i> Content Library</h3>
+                                <p>245 Movies</p>
+                                <p>120 TV Shows</p>
+                                <div class="button-group">
+                                    <button class="btn btn-primary btn-sm"><i class="fas fa-search"></i> Browse</button>
+                                    <button class="btn btn-success btn-sm"><i class="fas fa-upload"></i> Upload</button>
+                                </div>
+                            </div>
+                            
+                            <div class="service-card">
+                                <h3><i class="fas fa-music"></i> Music Library</h3>
+                                <p>1,245 Songs</p>
+                                <p>45 Playlists</p>
+                                <div class="button-group">
+                                    <button class="btn btn-primary btn-sm"><i class="fas fa-search"></i> Browse</button>
+                                    <button class="btn btn-success btn-sm"><i class="fas fa-upload"></i> Upload</button>
+                                </div>
+                            </div>
+                            
+                            <div class="service-card">
+                                <h3><i class="fas fa-newspaper"></i> News Content</h3>
+                                <p>Today's bulletins</p>
+                                <p>Breaking news</p>
+                                <div class="button-group">
+                                    <button class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Add</button>
+                                    <button class="btn btn-info btn-sm"><i class="fas fa-edit"></i> Edit</button>
+                                </div>
+                            </div>
+                            
+                            <div class="service-card">
+                                <h3><i class="fas fa-running"></i> Sports Content</h3>
+                                <p>Live matches</p>
+                                <p>Highlights</p>
+                                <div class="button-group">
+                                    <button class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Add</button>
+                                    <button class="btn btn-info btn-sm"><i class="fas fa-edit"></i> Edit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Graphics Tab -->
+                    <div id="graphics-tab" class="tab-content">
+                        <div class="service-grid">
+                            <div class="service-card">
+                                <h3><i class="fas fa-image"></i> Channel Logo</h3>
+                                <p>Current: ACTV_Logo.png</p>
+                                <div class="button-group">
+                                    <button class="btn btn-primary btn-sm"><i class="fas fa-upload"></i> Change</button>
+                                    <button class="btn btn-info btn-sm"><i class="fas fa-cog"></i> Settings</button>
+                                </div>
+                            </div>
+                            
+                            <div class="service-card">
+                                <h3><i class="fas fa-scroll"></i> Scrolling Text</h3>
+                                <textarea placeholder="Enter scrolling text content..."></textarea>
+                                <div class="button-group">
+                                    <button class="btn btn-success btn-sm"><i class="fas fa-play"></i> Activate</button>
+                                    <button class="btn btn-danger btn-sm"><i class="fas fa-stop"></i> Stop</button>
+                                </div>
+                            </div>
+                            
+                            <div class="service-card">
+                                <h3><i class="fas fa-pray"></i> Prayer Times</h3>
+                                <p>Auto-update: Enabled</p>
+                                <div class="button-group">
+                                    <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</button>
+                                    <button class="btn btn-info btn-sm"><i class="fas fa-sync"></i> Refresh</button>
+                                </div>
+                            </div>
+                            
+                            <div class="service-card">
+                                <h3><i class="fas fa-baseball-ball"></i> Sports Scores</h3>
+                                <p>Auto-update: Enabled</p>
+                                <div class="button-group">
+                                    <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</button>
+                                    <button class="btn btn-info btn-sm"><i class="fas fa-sync"></i> Refresh</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <footer>
+                <div class="contact-info">
+                    <div><i class="fas fa-user"></i> Anwar</div>
+                    <div><i class="fas fa-phone"></i> 01712082174</div>
+                    <div><i class="fas fa-envelope"></i> anwar@anwarcabletv.com</div>
+                </div>
+                <div>
+                    <span class="status-indicator status-on"></span> System Status: Operational
+                </div>
+            </footer>
+        </div>
+        
+        <!-- Monitor 2 - Output Display -->
+        <div class="monitor-2">
+            <header>
+                <div class="logo">
+                    <img src="logo.png" alt="Anwar Cable TV Logo">
+                    <h1>Anwar Cable TV</h1>
+                </div>
+                <div class="live-badge">LIVE</div>
+                <div class="time-date">
+                    <div id="output-time">12:45:30 PM</div>
+                    <div id="output-date">Sunday, June 22, 2025</div>
+                </div>
+            </header>
+            
+            <div class="video-output">
+                <!-- Current program content would be here -->
+                <div style="font-size: 36px; text-align: center;">
+                    <p>News Bulletin</p>
+                    <p style="font-size: 24px; margin-top: 20px;">12:45 PM - 1:00 PM</p>
+                </div>
+                
+                <div class="output-element next-program">
+                    <i class="fas fa-chevron-right"></i> Next: The Guardian (Movie) at 2:00 PM
+                </div>
+                
+                <div class="output-element channel-logo">ACTV</div>
+                
+                <div class="output-element prayer-times-bar">
+                    <div class="prayer-time">
+                        <div>Fajr</div>
+                        <div>4:15 AM</div>
+                    </div>
+                    <div class="prayer-time">
+                        <div>Dhuhr</div>
+                        <div>12:15 PM</div>
+                    </div>
+                    <div class="prayer-time">
+                        <div>Asr</div>
+                        <div>3:45 PM</div>
+                    </div>
+                    <div class="prayer-time">
+                        <div>Maghrib</div>
+                        <div>6:30 PM</div>
+                    </div>
+                    <div class="prayer-time">
+                        <div>Isha</div>
+                        <div>7:45 PM</div>
+                    </div>
+                </div>
+                
+                <div class="output-element sports-scores">
+                    <div class="score-item">
+                        <img src="cricket.png" alt="Cricket">
+                        <span>BAN 165/5 (19.2) vs IND 162/8 (20.0)</span>
+                    </div>
+                    <div class="score-item">
+                        <img src="football.png" alt="Football">
+                        <span>ARG 2-1 FRA (FT)</span>
+                    </div>
+                </div>
+                
+                <div class="output-element l-advertisement">
+                    <i class="fas fa-bullhorn" style="margin-right: 10px;"></i>
+                    Special Ramadan Offer: 20% discount on new connections this month! Call 01712082174
+                </div>
+                
+                <div class="output-element scrolling-text">
+                    <div class="scrolling-text-content">
+                        <i class="fas fa-newspaper" style="margin-right: 10px;"></i>
+                        Breaking News: Bangladesh wins by 5 wickets against India in T20 match • 
+                        Prime Minister to address the nation at 8pm tonight • 
+                        Special Ramadan programs starting next week on Anwar Cable TV • 
+                        Weather forecast: Rain expected in Dhaka tomorrow afternoon
+                    </div>
+                </div>
+            </div>
+            
+            <footer>
+                <div style="width: 70%;">
+                    <div class="scrolling-text-content">
+                        <i class="fas fa-info-circle" style="margin-right: 10px;"></i>
+                        Anwar Cable TV - Serving the community since 2010 • 
+                        Call 01712082174 for new connections • 
+                        Office: 123 TV Road, Dhaka • 
+                        Email: info@anwarcabletv.com
+                    </div>
+                </div>
+                <div>
+                    <i class="fas fa-signal"></i> Signal: 98% | <i class="fas fa-hdd"></i> Storage: 65% free
+                </div>
+            </footer>
+        </div>
+    </div>
+    
+    <script>
+        // Update time and date
+        function updateTime() {
+            const now = new Date();
+            const timeElements = document.querySelectorAll('#current-time, #output-time');
+            const dateElements = document.querySelectorAll('#current-date, #output-date');
+            
+            // Format time
+            let hours = now.getHours();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            const timeString = `${hours}:${minutes}:${seconds} ${ampm}`;
+            
+            timeElements.forEach(el => el.textContent = timeString);
+            
+            // Format date
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateString = now.toLocaleDateString('en-US', options);
+            dateElements.forEach(el => el.textContent = dateString);
+        }
+        
+        setInterval(updateTime, 1000);
+        updateTime();
+        
+        // Tab functionality
+        document.querySelectorAll('.service-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.service-tab, .tab-content').forEach(el => {
+                    el.classList.remove('active');
+                });
+                
+                // Add active class to clicked tab and corresponding content
+                this.classList.add('active');
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+        
+        // Simulate progress bar movement
+        setInterval(() => {
+            const progressBar = document.querySelector('.progress-bar');
+            const currentWidth = parseFloat(progressBar.style.width) || 0;
+            const newWidth = (currentWidth + 0.5) % 100;
+            progressBar.style.width = `${newWidth}%`;
+        }, 1000);
+        
+        // Button hover effects
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+        
+        // Volume control display
+        const volumeSlider = document.querySelector('.volume-control input');
+        volumeSlider.addEventListener('input', function() {
+            const volumeValue = this.value;
+            const volumeIcon = document.querySelector('.volume-icon');
+            this.nextElementSibling.textContent = `${volumeValue}%`;
+            
+            if (volumeValue == 0) {
+                volumeIcon.className = 'fas fa-volume-mute volume-icon';
+            } else if (volumeValue < 50) {
+                volumeIcon.className = 'fas fa-volume-down volume-icon';
+            } else {
+                volumeIcon.className = 'fas fa-volume-up volume-icon';
+            }
+        });
+        
+        // Playback control functionality
+        document.querySelectorAll('.playback-controls .btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Visual feedback
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1.05)';
+                }, 100);
+                
+                // Here you would add actual playback control functionality
+            });
+        });
+    </script>
+</body>
+</html>
